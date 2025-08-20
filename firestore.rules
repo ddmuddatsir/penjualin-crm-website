@@ -1,0 +1,44 @@
+// firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🚨 DEVELOPMENT RULES - Allow all access for console visibility
+    // ⚠️ WARNING: Update these rules for production!
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Production rules (commented for development):
+    /*
+    // Users collection - users can read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && resource.data.isActive == true;
+    }
+    
+    // Leads collection - authenticated users can read/write
+    match /leads/{leadId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Deals collection - authenticated users can read/write
+    match /deals/{dealId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Activities collection - authenticated users can read/write
+    match /activities/{activityId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Reports collection - authenticated users can read/write
+    match /reports/{reportId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+                   (request.auth.uid == resource.data.userId || 
+                    resource.data.isPublic == true);
+    }
+    */
+  }
+}
