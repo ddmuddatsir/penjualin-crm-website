@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { COLOR_GRAY_100, COLOR_GRAY_500 } from "@/lib/colors";
 
 export function Footer() {
   const footerLinks = [
@@ -11,19 +10,20 @@ export function Footer() {
   ];
 
   return (
-    <footer
-      className="py-8 px-4 mt-auto"
-      style={{ background: COLOR_GRAY_100 }}
-    >
+    <footer className="py-8 px-4 mt-auto bg-muted">
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-4 justify-between items-center">
         <div className="flex flex-wrap justify-center gap-6 text-sm">
           {footerLinks.map((link, index) => (
-            <Link key={index} href={link.href} className="hover:underline">
+            <Link
+              key={index}
+              href={link.href}
+              className="hover:underline text-muted-foreground hover:text-foreground transition-colors"
+            >
               {link.text}
             </Link>
           ))}
         </div>
-        <div className="text-sm" style={{ color: COLOR_GRAY_500 }}>
+        <div className="text-sm text-muted-foreground">
           © 2024 PenjualinCRM. All rights reserved.
         </div>
       </div>

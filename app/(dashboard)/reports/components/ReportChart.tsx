@@ -8,7 +8,6 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { COLOR_BLUE_600, COLOR_GREEN_500 } from "@/lib/colors";
 
 interface ReportChartProps {
   data: Array<{ month: string; leads: number; deals: number }> | undefined;
@@ -27,8 +26,12 @@ export default function ReportChart({ data }: ReportChartProps) {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="deals" fill={COLOR_BLUE_600} name="Deals Closed" />
-            <Bar dataKey="leads" fill={COLOR_GREEN_500} name="Leads" />
+            <Bar
+              dataKey="deals"
+              fill="hsl(var(--primary))"
+              name="Deals Closed"
+            />
+            <Bar dataKey="leads" fill="hsl(var(--chart-2))" name="Leads" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

@@ -4,18 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { EventClickArg, EventApi } from "@fullcalendar/core";
-import {
-  ACTIVITY_TYPE_COLORS,
-  ACTIVITY_TYPE_BORDERS,
-  COLOR_GRAY_MEDIUM,
-  COLOR_GRAY_LIGHT,
-  COLOR_BLACK,
-  COLOR_WHITE,
-  COLOR_SHADOW_SOFT,
-  COLOR_BLUE_22,
-  COLOR_BLUE_33,
-  COLOR_BLUE_600,
-} from "@/lib/colors";
+import { ACTIVITY_TYPE_COLORS, ACTIVITY_TYPE_BORDERS } from "@/lib/colors";
 import type { ClientActivity } from "@/types/firebase";
 import type { ActivityCalendarEvent } from "@/types";
 
@@ -49,9 +38,9 @@ export default function ActivityCalendar({
         a.createdAt instanceof Date
           ? a.createdAt.toISOString()
           : new Date(a.createdAt).toISOString(),
-      backgroundColor: ACTIVITY_TYPE_COLORS[a.type] || `${COLOR_GRAY_MEDIUM}22`,
-      borderColor: ACTIVITY_TYPE_BORDERS[a.type] || COLOR_GRAY_MEDIUM,
-      textColor: COLOR_BLACK,
+      backgroundColor: ACTIVITY_TYPE_COLORS[a.type] || "hsl(var(--muted))",
+      borderColor: ACTIVITY_TYPE_BORDERS[a.type] || "hsl(var(--border))",
+      textColor: "hsl(var(--foreground))",
       extendedProps: {
         activity: {
           ...a,
@@ -111,7 +100,7 @@ export default function ActivityCalendar({
         }) => {
           // Tooltip minimalis
           const tooltip = document.createElement("div");
-          tooltip.innerHTML = `<div style='background:${COLOR_BLACK};color:${COLOR_WHITE};padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;box-shadow:${COLOR_SHADOW_SOFT};'>${
+          tooltip.innerHTML = `<div style='background:hsl(var(--popover));color:hsl(var(--popover-foreground));padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.15);border:1px solid hsl(var(--border));'>${
             info.event.title
           }<br/>${new Date(info.event.start!).toLocaleTimeString([], {
             hour: "2-digit",
@@ -160,16 +149,16 @@ export default function ActivityCalendar({
           font-size: 13px;
           padding: 2px 10px;
           box-shadow: none;
-          background: ${COLOR_GRAY_LIGHT};
-          color: ${COLOR_BLACK};
+          background: hsl(var(--muted));
+          color: hsl(var(--foreground));
           border: none;
         }
         .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active {
-          background: ${COLOR_BLUE_22};
-          color: ${COLOR_BLUE_600};
+          background: hsl(var(--primary));
+          color: hsl(var(--primary-foreground));
         }
         .fc .fc-button-primary:focus {
-          box-shadow: 0 0 0 2px ${COLOR_BLUE_33};
+          box-shadow: 0 0 0 2px hsl(var(--ring));
         }
         .fc .fc-daygrid-day-number {
           font-size: 12px;

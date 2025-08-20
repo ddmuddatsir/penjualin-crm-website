@@ -1,11 +1,4 @@
 import { Star, Quote } from "lucide-react";
-import {
-  COLOR_WHITE,
-  COLOR_BLUE_600,
-  COLOR_GRAY_600,
-  COLOR_GRAY_500,
-  COLOR_YELLOW_100,
-} from "@/lib/colors";
 
 interface TestimonialProps {
   name: string;
@@ -14,7 +7,6 @@ interface TestimonialProps {
   avatar: string;
   rating: number;
   text: string;
-  bgColor: string;
 }
 
 function TestimonialCard({
@@ -24,20 +16,12 @@ function TestimonialCard({
   avatar,
   rating,
   text,
-  bgColor,
 }: TestimonialProps) {
   return (
-    <div
-      className="rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-      style={{ background: COLOR_WHITE }}
-    >
+    <div className="rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-card border border-border">
       {/* Quote Icon */}
       <div className="mb-4">
-        <Quote
-          size={32}
-          style={{ color: COLOR_BLUE_600 }}
-          className="opacity-60"
-        />
+        <Quote size={32} className="text-primary opacity-60" />
       </div>
 
       {/* Rating Stars */}
@@ -46,38 +30,28 @@ function TestimonialCard({
           <Star
             key={i}
             size={16}
-            style={{
-              color: i < rating ? COLOR_YELLOW_100 : "#e5e7eb",
-              fill: i < rating ? COLOR_YELLOW_100 : "#e5e7eb",
-            }}
+            className={`${
+              i < rating
+                ? "text-yellow-400 fill-yellow-400"
+                : "text-muted-foreground"
+            }`}
           />
         ))}
       </div>
 
       {/* Testimonial Text */}
-      <p
-        className="text-base leading-relaxed mb-6 italic"
-        style={{ color: COLOR_GRAY_600 }}
-      >
+      <p className="text-base leading-relaxed mb-6 italic text-muted-foreground">
         &quot;{text}&quot;
       </p>
 
       {/* Profile */}
       <div className="flex items-center gap-4">
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-          style={{ backgroundColor: bgColor }}
-        >
+        <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold text-white bg-primary">
           {avatar}
         </div>
         <div>
-          <h4
-            className="font-semibold text-lg"
-            style={{ color: COLOR_GRAY_500 }}
-          >
-            {name}
-          </h4>
-          <p className="text-sm" style={{ color: COLOR_GRAY_600 }}>
+          <h4 className="font-semibold text-lg text-foreground">{name}</h4>
+          <p className="text-sm text-muted-foreground">
             {role} • {company}
           </p>
         </div>
@@ -95,7 +69,6 @@ export function TestimonialsSection() {
       avatar: "🧑‍💼",
       rating: 5,
       text: "PenjualinCRM benar-benar mengubah cara tim sales kami bekerja. Productivity meningkat 60% dan closing rate naik dari 15% menjadi 35%. Interface-nya sangat user-friendly!",
-      bgColor: "#3B82F6",
     },
     {
       name: "Rizky Firmansyah",
@@ -104,7 +77,6 @@ export function TestimonialsSection() {
       avatar: "🧑‍🎓",
       rating: 5,
       text: "Team collaboration feature-nya amazing! Semua sales rep bisa sync progress leads, dan manager bisa monitor performance tim dengan mudah. Highly recommended!",
-      bgColor: "#8B5CF6",
     },
     {
       name: "Linda Permata",
@@ -113,25 +85,18 @@ export function TestimonialsSection() {
       avatar: "👩‍⚕️",
       rating: 5,
       text: "Customer support 24/7 nya benar-benar responsive. Setiap ada pertanyaan langsung dibantu dengan sabar. Onboarding process juga very smooth dan comprehensive.",
-      bgColor: "#EF4444",
     },
   ];
 
   return (
-    <section className="py-20 px-4" id="testimonials">
+    <section className="py-20 px-4 bg-background" id="testimonials">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2
-            className="text-2xl font-bold mb-4"
-            style={{ color: COLOR_GRAY_600 }}
-          >
+          <h2 className="text-2xl font-bold mb-4 text-foreground">
             Apa Kata Mereka Tentang Kami
           </h2>
-          <p
-            className="text-lg max-w-xl mx-auto"
-            style={{ color: COLOR_GRAY_600 }}
-          >
+          <p className="text-lg max-w-xl mx-auto text-muted-foreground">
             Ribuan bisnis di Indonesia sudah merasakan manfaat PenjualinCRM.
             Dengarkan cerita sukses mereka yang telah meningkatkan penjualan
             dengan platform kami.
@@ -146,46 +111,23 @@ export function TestimonialsSection() {
         </div>
 
         {/* Stats Bar */}
-        <div
-          className="rounded-xl p-8 text-center"
-          style={{ background: COLOR_WHITE }}
-        >
+        <div className="rounded-xl p-8 text-center bg-card border border-border">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: COLOR_BLUE_600 }}
-              >
-                5,000+
-              </div>
-              <p style={{ color: COLOR_GRAY_600 }}>Happy Customers</p>
+              <div className="text-3xl font-bold mb-2 text-primary">5,000+</div>
+              <p className="text-muted-foreground">Happy Customers</p>
             </div>
             <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: COLOR_BLUE_600 }}
-              >
-                4.9/5
-              </div>
-              <p style={{ color: COLOR_GRAY_600 }}>Average Rating</p>
+              <div className="text-3xl font-bold mb-2 text-primary">4.9/5</div>
+              <p className="text-muted-foreground">Average Rating</p>
             </div>
             <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: COLOR_BLUE_600 }}
-              >
-                98%
-              </div>
-              <p style={{ color: COLOR_GRAY_600 }}>Customer Satisfaction</p>
+              <div className="text-3xl font-bold mb-2 text-primary">98%</div>
+              <p className="text-muted-foreground">Customer Satisfaction</p>
             </div>
             <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: COLOR_BLUE_600 }}
-              >
-                24/7
-              </div>
-              <p style={{ color: COLOR_GRAY_600 }}>Support Available</p>
+              <div className="text-3xl font-bold mb-2 text-primary">24/7</div>
+              <p className="text-muted-foreground">Support Available</p>
             </div>
           </div>
         </div>

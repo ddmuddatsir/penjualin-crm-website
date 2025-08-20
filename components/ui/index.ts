@@ -78,7 +78,7 @@ export {
   TableHeader,
   TableRow,
 } from "./table";
-export { ThemeToggle } from "./ThemeToggle";
+export { ThemeToggle } from "./theme-toggle";
 export { Toaster } from "./toaster";
 
 // New reusable components

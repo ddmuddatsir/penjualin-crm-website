@@ -10,13 +10,11 @@
     "firebase:setup": "firebase init",
     "firebase:emulate": "firebase emulators:start --only firestore,auth",
     "firebase:populate": "curl -X POST http://localhost:3000/api/firebase/populate",
-    "firebase:populate-12": "curl -X POST http://localhost:3000/api/firebase/populate-12",
     "firebase:test": "node test-firebase-comprehensive.mjs",
     "firebase:production": "NEXT_PUBLIC_USE_FIREBASE_EMULATOR=false npm run dev",
     "firebase:full-setup": "node scripts/setup-and-populate.js",
     "migrate:firebase": "npx tsx scripts/migrate-to-firebase.ts",
-    "sample:generate": "npx tsx scripts/generate-sample-data.ts",
-    "sample:generate-12": "npx tsx scripts/generate-12-sample-data.ts"
+    "sample:generate": "npx tsx scripts/generate-sample-data.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

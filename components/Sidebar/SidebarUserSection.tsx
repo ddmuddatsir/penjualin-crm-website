@@ -1,4 +1,5 @@
 import { Button } from "../ui/button";
+import { ThemeToggle } from "../ui/theme-toggle";
 import { LogOut, User } from "lucide-react";
 import { SIDEBAR_CONFIG } from "../../constants/sidebar";
 import type { SidebarUserSectionProps } from "../../types/sidebar";
@@ -24,6 +25,12 @@ export function SidebarUserSection({
           </div>
         </div>
       )}
+
+      {/* Theme Toggle */}
+      <div className="flex justify-center mb-2">
+        <ThemeToggle />
+      </div>
+
       <Button
         variant="ghost"
         size="sm"

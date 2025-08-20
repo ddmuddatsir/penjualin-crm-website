@@ -2,17 +2,11 @@ import { motion } from "framer-motion";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
-import {
-  STATUS_COLORS,
-  COLOR_GRAY_MEDIUM,
-  COLOR_GRAY_LIGHT,
-  COLOR_WHITE,
-  COLOR_SHADOW,
-} from "@/lib/colors";
+import { STATUS_COLORS } from "@/lib/colors";
 import { SortableLeadProps } from "@/types";
 
 function statusColor(status: string) {
-  return STATUS_COLORS[status] || COLOR_GRAY_MEDIUM;
+  return STATUS_COLORS[status] || "#6b7280"; // gray-500 fallback
 }
 
 export default function SortableLead({
@@ -35,32 +29,32 @@ export default function SortableLead({
       initial={{ scale: 1 }}
       animate={{
         scale: isDragging ? 1.05 : 1,
-        boxShadow: isDragging ? COLOR_SHADOW : "none",
+        boxShadow: isDragging ? "0 4px 16px rgba(0,0,0,0.15)" : "none",
       }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
-        background: isDragging ? COLOR_GRAY_LIGHT : undefined,
+        background: isDragging ? "rgb(243 244 246)" : undefined, // gray-100
         borderLeft: `4px solid ${statusColor(status)}`,
         cursor: "grab",
       }}
       {...attributes}
       {...listeners}
       onClick={() => setActiveLead(lead)}
-      className="bg-white dark:bg-zinc-900 border rounded p-3 shadow-sm flex flex-col gap-1"
+      className="bg-card border border-border rounded p-3 shadow-sm flex flex-col gap-1 dark:bg-card"
     >
-      <div className="font-semibold flex items-center gap-2">
+      <div className="font-semibold flex items-center gap-2 text-foreground">
         {lead.name}
         <span
-          className={`text-xs px-2 py-0.5 rounded-full`}
-          style={{ background: statusColor(status), color: COLOR_WHITE }}
+          className="text-xs px-2 py-0.5 rounded-full text-white"
+          style={{ background: statusColor(status) }}
         >
           {status}
         </span>
       </div>
-      <div className="text-xs text-gray-500">{lead.company}</div>
-      <div className="text-xs text-gray-500">{lead.email}</div>
+      <div className="text-xs text-muted-foreground">{lead.company}</div>
+      <div className="text-xs text-muted-foreground">{lead.email}</div>
     </motion.div>
   );
 }

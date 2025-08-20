@@ -2,7 +2,6 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { COLOR_WHITE } from "@/lib/colors";
 import {
   NavigationBar,
   HeroSection,
@@ -32,10 +31,7 @@ export default function Home() {
   const isAuthenticated = !!user;
 
   return (
-    <div
-      className="flex flex-col min-h-screen"
-      style={{ background: COLOR_WHITE }}
-    >
+    <div className="flex flex-col min-h-screen bg-background">
       <NavigationBar
         isAuthenticated={isAuthenticated}
         userName={user?.displayName || user?.email}

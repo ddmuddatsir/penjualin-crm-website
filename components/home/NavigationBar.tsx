@@ -1,10 +1,4 @@
 import { Button } from "@/components/ui/button";
-import {
-  COLOR_BLUE_600,
-  COLOR_GRAY_100,
-  COLOR_GRAY_500,
-  COLOR_WHITE,
-} from "@/lib/colors";
 import type { NavigationBarProps } from "@/types/components";
 
 export function NavigationBar({
@@ -16,22 +10,11 @@ export function NavigationBar({
   if (!isAuthenticated) return null;
 
   return (
-    <nav
-      className="border-b px-4 py-3"
-      style={{
-        background: COLOR_WHITE,
-        borderBottomColor: COLOR_GRAY_100,
-      }}
-    >
+    <nav className="border-b border-border bg-background px-4 py-3">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <span
-            className="font-bold text-2xl"
-            style={{ color: COLOR_BLUE_600 }}
-          >
-            PenjualinCRM
-          </span>
-          <span className="text-sm" style={{ color: COLOR_GRAY_500 }}>
+          <span className="font-bold text-2xl text-primary">PenjualinCRM</span>
+          <span className="text-sm text-muted-foreground">
             Welcome, {userName}
           </span>
         </div>

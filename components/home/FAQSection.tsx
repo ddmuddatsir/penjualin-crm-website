@@ -4,13 +4,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import {
-  COLOR_WHITE,
-  COLOR_GRAY_50,
-  COLOR_BLUE_600,
-  COLOR_GRAY_600,
-  COLOR_GRAY_500,
-} from "../../lib/colors";
 
 export function FAQSection() {
   const faqs = [
@@ -67,24 +60,14 @@ export function FAQSection() {
   ];
 
   return (
-    <section
-      className="py-20 px-4"
-      style={{ background: COLOR_GRAY_50 }}
-      id="faq"
-    >
+    <section className="py-20 px-4 bg-muted" id="faq">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2
-            className="text-4xl font-bold mb-4"
-            style={{ color: COLOR_GRAY_500 }}
-          >
+          <h2 className="text-4xl font-bold mb-4 text-foreground">
             Frequently Asked Questions
           </h2>
-          <p
-            className="text-lg max-w-2xl mx-auto"
-            style={{ color: COLOR_GRAY_600 }}
-          >
+          <p className="text-lg max-w-2xl mx-auto text-muted-foreground">
             Temukan jawaban untuk pertanyaan yang sering diajukan tentang
             PenjualinCRM. Masih ada pertanyaan? Hubungi tim support kami yang
             siap membantu 24/7.
@@ -92,27 +75,18 @@ export function FAQSection() {
         </div>
 
         {/* FAQ Accordion */}
-        <div
-          className="rounded-xl p-8 shadow-lg"
-          style={{ background: COLOR_WHITE }}
-        >
+        <div className="rounded-xl p-8 shadow-lg bg-card border border-border">
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="border border-gray-200 rounded-lg px-6 py-2 hover:shadow-md transition-all duration-200"
+                className="border border-border rounded-lg px-6 py-2 hover:shadow-md transition-all duration-200"
               >
-                <AccordionTrigger
-                  className="text-left font-semibold text-lg hover:no-underline py-4"
-                  style={{ color: COLOR_GRAY_600 }}
-                >
+                <AccordionTrigger className="text-left font-semibold text-lg hover:no-underline py-4 text-foreground">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent
-                  className="text-base leading-relaxed pb-4"
-                  style={{ color: COLOR_GRAY_600 }}
-                >
+                <AccordionContent className="text-base leading-relaxed pb-4 text-muted-foreground">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -122,13 +96,10 @@ export function FAQSection() {
 
         {/* CTA at bottom */}
         <div className="text-center mt-12">
-          <p className="text-lg mb-4" style={{ color: COLOR_GRAY_600 }}>
+          <p className="text-lg mb-4 text-muted-foreground">
             Masih ada pertanyaan lain?
           </p>
-          <button
-            className="px-8 py-3 rounded-lg font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            style={{ backgroundColor: COLOR_BLUE_600 }}
-          >
+          <button className="px-8 py-3 rounded-lg font-semibold text-primary-foreground bg-primary transition-all duration-200 hover:scale-105 hover:shadow-lg">
             Hubungi Support Kami
           </button>
         </div>
