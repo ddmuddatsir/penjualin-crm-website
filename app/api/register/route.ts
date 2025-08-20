@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+import { usersService } from "@/services/firebase";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
 
 const schema = z.object({
   name: z.string().min(2),
@@ -22,25 +19,35 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const { name, email, password, role } = parsed.data;
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const { name, email, role } = parsed.data;
+
+    // Check if user already exists
+    const existingUsers = await usersService.getUsers();
+    const existing = existingUsers.find((user) => user.email === email);
     if (existing) {
       return NextResponse.json(
         { message: "Email sudah terdaftar" },
         { status: 400 }
       );
     }
-    const hashed = await bcrypt.hash(password, 10);
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashed,
-        role,
+
+    // Create new user in Firebase
+    const newUserId = await usersService.create({
+      name,
+      email,
+      role: role === "SALES" ? "SALES_REP" : "MANAGER",
+      avatar: undefined,
+      isActive: true,
+      lastLoginAt: undefined,
+      settings: {
+        timezone: "Asia/Jakarta",
+        notifications: true,
+        emailUpdates: true,
       },
     });
+
     return NextResponse.json(
-      { message: "Registrasi berhasil" },
+      { message: "Registrasi berhasil", userId: newUserId },
       { status: 201 }
     );
   } catch (error) {
