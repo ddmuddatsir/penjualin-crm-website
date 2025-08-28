@@ -81,7 +81,7 @@ export default function RegisterPage() {
         <Card className="w-full max-w-md shadow-lg border-0">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">
-              Register CRM SaaS
+              Register PenjualinCRM
             </CardTitle>
           </CardHeader>
           <CardContent>
