@@ -87,7 +87,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md shadow-lg border-0">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">
-              Sign in to CRM SaaS
+              Sign in to PenjualinCRM
             </CardTitle>
           </CardHeader>
           <CardContent>
