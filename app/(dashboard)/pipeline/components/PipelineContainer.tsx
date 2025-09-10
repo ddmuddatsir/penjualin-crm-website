@@ -102,7 +102,7 @@ export default function PipelineContainer() {
         open={!!activeLead}
         onOpenChange={handleCloseLeadDetail}
         lead={activeLead}
-        onEdit={handleEditLead}
+        onEdit={() => activeLead && handleEditLead(activeLead)}
       />
 
       {/* Edit Lead Dialog */}

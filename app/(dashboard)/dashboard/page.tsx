@@ -10,6 +10,19 @@ import { PageLayout } from "@/components/layouts";
 import type { LeadType, DashboardActivityType } from "@/types/models";
 import type { ClientLead, ClientActivity } from "@/types/firebase";
 
+// Extended type for activities with related info
+type ActivityWithRelatedInfo = ClientActivity & {
+  relatedInfo?: {
+    type: "Lead" | "Deal";
+    name: string;
+    company?: string;
+    email?: string;
+    status?: string;
+    value?: number;
+    stage?: string;
+  } | null;
+};
+
 // Helper functions untuk konversi tipe
 const convertFirebaseLeadToLeadType = (lead: ClientLead): LeadType => ({
   id: lead.id,
@@ -30,7 +43,7 @@ const convertFirebaseLeadToLeadType = (lead: ClientLead): LeadType => ({
 });
 
 const convertFirebaseActivityToDashboardActivity = (
-  activity: ClientActivity
+  activity: ActivityWithRelatedInfo
 ): DashboardActivityType => ({
   id: activity.id,
   type: activity.type,
@@ -39,6 +52,7 @@ const convertFirebaseActivityToDashboardActivity = (
   dealId: activity.dealId,
   userId: activity.userId,
   metadata: activity.metadata,
+  relatedInfo: activity.relatedInfo || null,
   createdAt:
     activity.createdAt instanceof Date
       ? activity.createdAt
@@ -57,8 +71,11 @@ export default function DashboardPage() {
   const convertedLeads =
     data?.leadsTerbaru?.map(convertFirebaseLeadToLeadType) || [];
   const convertedActivities =
-    data?.activitiesTerakhir?.map(convertFirebaseActivityToDashboardActivity) ||
-    [];
+    data?.activitiesTerakhir?.map((activity) =>
+      convertFirebaseActivityToDashboardActivity(
+        activity as ActivityWithRelatedInfo
+      )
+    ) || [];
 
   return (
     <PageLayout

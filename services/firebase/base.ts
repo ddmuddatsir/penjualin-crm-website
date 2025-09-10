@@ -64,9 +64,17 @@ export class FirebaseBaseService<T extends { id: string }> {
    */
   async getAll(constraints: QueryConstraint[] = []): Promise<T[]> {
     try {
+      console.log(
+        `Getting all ${this.collectionName} with constraints:`,
+        constraints.length
+      );
       const q = query(this.getCollection(), ...constraints);
       const snapshot = await getDocs(q);
-      return snapshot.docs.map((doc) => this.docToData(doc));
+      const results = snapshot.docs.map((doc) => this.docToData(doc));
+      console.log(
+        `Found ${results.length} documents in ${this.collectionName}`
+      );
+      return results;
     } catch (error) {
       console.error(`Error getting ${this.collectionName}:`, error);
       throw error;
@@ -204,7 +212,7 @@ export class FirebaseBaseService<T extends { id: string }> {
   /**
    * Search documents by field
    */
-  async search(field: string, value: any): Promise<T[]> {
+  async search(field: string, value: unknown): Promise<T[]> {
     try {
       const q = query(
         this.getCollection(),

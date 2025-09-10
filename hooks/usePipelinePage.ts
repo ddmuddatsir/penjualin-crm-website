@@ -1,13 +1,30 @@
 import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DragEndEvent } from "@dnd-kit/core";
-import { LEAD_STATUS_OPTIONS, LEAD_STATUS_LABELS } from "@/constants/lead";
+import {
+  LEAD_STATUS_OPTIONS,
+  LEAD_STATUS_LABELS,
+  LEAD_STATUS,
+} from "@/constants/lead";
 import { useLeads } from "@/hooks/useLeads";
 import { activityService } from "@/services";
-import type { ClientLead } from "@/types/firebase";
+import type { ClientLead, FirestoreLead } from "@/types/firebase";
 
 const STATUSES = LEAD_STATUS_OPTIONS;
 const STATUS_LABELS = LEAD_STATUS_LABELS;
+const VALID_STATUSES = Object.values(LEAD_STATUS);
+
+// Function to validate and sanitize lead status
+const validateLeadStatus = (status: string): string => {
+  const validStatus = VALID_STATUSES.find((s) => s === status);
+  if (!validStatus) {
+    console.warn(
+      `❌ Invalid lead status found: "${status}", defaulting to OPEN`
+    );
+    return LEAD_STATUS.OPEN;
+  }
+  return validStatus as string;
+};
 
 type LeadFilters = {
   q: string;
@@ -25,7 +42,19 @@ export function usePipelinePage() {
     isLoading,
     updateLead,
     createLead,
+    refetchLeads,
   } = useLeads();
+
+  // Debug logging
+  console.log("usePipelinePage - allLeads:", allLeads.length, allLeads);
+  console.log("usePipelinePage - isLoading:", isLoading);
+
+  // Force refresh Firebase data
+  const refreshFirebaseData = () => {
+    console.log("Force refreshing Firebase data...");
+    refetchLeads();
+    queryClient.invalidateQueries({ queryKey: ["leads"] });
+  };
 
   // State
   const [filters, setFilters] = useState<LeadFilters>({
@@ -46,50 +75,161 @@ export function usePipelinePage() {
     date: new Date().toISOString().split("T")[0],
   });
 
-  // Apply filters to leads
-  const leads = useMemo(() => {
-    let filteredLeads = allLeads;
-
-    if (filters.q) {
-      const searchTerm = filters.q.toLowerCase();
-      filteredLeads = filteredLeads.filter(
-        (lead) =>
-          lead.name.toLowerCase().includes(searchTerm) ||
-          lead.company.toLowerCase().includes(searchTerm) ||
-          lead.email.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    if (filters.status && filters.status !== "all") {
-      filteredLeads = filteredLeads.filter(
-        (lead) => lead.status === filters.status
-      );
-    }
-
-    if (filters.owner && filters.owner !== "all") {
-      filteredLeads = filteredLeads.filter(
-        (lead) => lead.assignedTo === filters.owner
-      );
-    }
-
-    if (filters.date) {
-      const filterDate = new Date(filters.date);
-      filteredLeads = filteredLeads.filter((lead) => {
-        const leadDate = new Date(lead.createdAt);
-        return leadDate.toDateString() === filterDate.toDateString();
+  // Apply filters to leads dengan fallback dummy data
+  const leads: ClientLead[] = useMemo(() => {
+    if (allLeads && allLeads.length > 0) {
+      // Validasi status dan filter
+      let filteredLeads = allLeads.map((lead) => {
+        const validatedStatus = validateLeadStatus(lead.status);
+        return {
+          ...lead,
+          status: validatedStatus as
+            | "OPEN"
+            | "CONTACTED"
+            | "PROPOSAL"
+            | "CLOSED",
+        };
       });
+
+      if (filters.q && filters.q.trim()) {
+        const searchTerm = filters.q.toLowerCase();
+        filteredLeads = filteredLeads.filter(
+          (lead) =>
+            lead.name.toLowerCase().includes(searchTerm) ||
+            lead.company.toLowerCase().includes(searchTerm) ||
+            lead.email.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      if (filters.status && filters.status !== "all") {
+        filteredLeads = filteredLeads.filter(
+          (lead) => lead.status === filters.status
+        );
+      }
+
+      if (filters.owner && filters.owner !== "all") {
+        filteredLeads = filteredLeads.filter(
+          (lead) => lead.assignedTo === filters.owner
+        );
+      }
+
+      if (filters.date) {
+        const filterDate = new Date(filters.date);
+        filteredLeads = filteredLeads.filter((lead) => {
+          const leadDate = new Date(lead.createdAt);
+          return leadDate.toDateString() === filterDate.toDateString();
+        });
+      }
+
+      return filteredLeads;
     }
 
-    return filteredLeads;
-  }, [allLeads, filters]);
+    // Dummy data jika tidak ada data Firebase dan tidak loading
+    if (!isLoading) {
+      return [
+        {
+          id: "dummy-1",
+          name: "Test Lead 1",
+          company: "Test Company 1",
+          email: "test1@example.com",
+          phone: "123-456-7890",
+          status: "OPEN" as const,
+          source: "MANUAL" as const,
+          value: 1000,
+          notes: "Test lead 1",
+          assignedTo: "admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: "dummy-2",
+          name: "Test Lead 2",
+          company: "Test Company 2",
+          email: "test2@example.com",
+          phone: "123-456-7891",
+          status: "CONTACTED" as const,
+          source: "MANUAL" as const,
+          value: 2000,
+          notes: "Test lead 2",
+          assignedTo: "admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: "dummy-3",
+          name: "Test Lead 3",
+          company: "Test Company 3",
+          email: "test3@example.com",
+          phone: "123-456-7892",
+          status: "PROPOSAL" as const,
+          source: "MANUAL" as const,
+          value: 3000,
+          notes: "Test lead 3",
+          assignedTo: "admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: "dummy-4",
+          name: "Test Lead 4",
+          company: "Test Company 4",
+          email: "test4@example.com",
+          phone: "123-456-7893",
+          status: "CLOSED" as const,
+          source: "MANUAL" as const,
+          value: 4000,
+          notes: "Test lead 4",
+          assignedTo: "admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+    }
+
+    return [];
+  }, [allLeads, filters, isLoading]);
 
   // Group leads by status
   const groupedColumns = useMemo(() => {
+    console.log("=== DEBUGGING GROUPING ===");
+    console.log("Computing groupedColumns with leads:", leads.length);
+    console.log("Leads to group:", leads);
+
     const grouped: Record<string, ClientLead[]> = {};
-    STATUSES.forEach((s) => (grouped[s] = []));
-    leads.forEach((lead) => {
-      grouped[lead.status]?.push(lead);
+
+    // Initialize empty arrays for all statuses
+    STATUSES.forEach((status) => {
+      grouped[status] = [];
     });
+
+    // Group leads berdasarkan status
+    leads.forEach((lead: ClientLead) => {
+      console.log(`Processing lead: ${lead.name} with status: ${lead.status}`);
+      if (grouped[lead.status]) {
+        grouped[lead.status].push(lead);
+        console.log(`✅ Added lead to ${lead.status} column`);
+      } else {
+        // Jika status tidak ada di STATUSES, tetap tambahkan untuk debug
+        console.warn(`❌ Unknown status found: ${lead.status}`);
+        grouped[lead.status] = [lead];
+      }
+    });
+
+    console.log(
+      "✅ Grouped result summary:",
+      Object.keys(grouped).map((k) => `${k}: ${grouped[k].length}`)
+    );
+    console.log("✅ Detailed grouped result:", grouped);
+
+    // Verify total count
+    const totalInGroups = Object.values(grouped).reduce(
+      (sum, arr) => sum + arr.length,
+      0
+    );
+    console.log(
+      `📊 Total leads in groups: ${totalInGroups}, Original leads: ${leads.length}`
+    );
+
     return grouped;
   }, [leads]);
 
@@ -101,117 +241,101 @@ export function usePipelinePage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      console.log("Lead updated successfully");
     },
-  });
-
-  const editLeadMutation = useMutation({
-    mutationFn: async (data: {
-      id: string;
-      name?: string;
-      company?: string;
-      email?: string;
-      status?: string;
-    }) => {
-      const { id, ...updateData } = data;
-      const cleanedData: Partial<Omit<ClientLead, "id" | "createdAt">> = {};
-      if (updateData.name) cleanedData.name = updateData.name;
-      if (updateData.company) cleanedData.company = updateData.company;
-      if (updateData.email) cleanedData.email = updateData.email;
-      if (updateData.status)
-        cleanedData.status = updateData.status as
-          | "OPEN"
-          | "CONTACTED"
-          | "PROPOSAL"
-          | "CLOSED";
-
-      return await updateLead(id, cleanedData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
+    onError: (error) => {
+      console.error("Failed to update lead:", error);
     },
   });
 
   const addLeadMutation = useMutation({
-    mutationFn: async (data: {
-      name: string;
-      company: string;
-      email: string;
-      status: string | null;
-    }) => {
-      const leadData: Omit<ClientLead, "id" | "createdAt" | "updatedAt"> = {
-        name: data.name,
-        company: data.company,
-        email: data.email,
-        status: (data.status || "OPEN") as
-          | "OPEN"
-          | "CONTACTED"
-          | "PROPOSAL"
-          | "CLOSED",
-        phone: "",
-        source: "MANUAL",
-        value: 0,
-        notes: "",
-        assignedTo: "admin",
-      };
+    mutationFn: async (
+      leadData: Omit<FirestoreLead, "id" | "createdAt" | "updatedAt">
+    ) => {
       return await createLead(leadData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
-      setAddStatus(null);
-      setNewLead({ name: "", company: "", email: "" });
+      console.log("Lead added successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to add lead:", error);
+    },
+  });
+
+  const editLeadMutation = useMutation({
+    mutationFn: async (leadData: { id: string; [key: string]: unknown }) => {
+      const { id, ...updateData } = leadData;
+      return await updateLead(id, updateData);
+    },
+    onSuccess: () => {
+      console.log("Lead edited successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to edit lead:", error);
     },
   });
 
   const addActivityMutation = useMutation({
-    mutationFn: async (data: {
-      type: string;
-      title: string;
-      notes: string;
-      date: string;
-      leadId: string;
-      userId?: string;
-    }) => {
-      const activityData = {
-        type: data.type as
-          | "CALL"
-          | "EMAIL"
-          | "MEETING"
-          | "NOTE"
-          | "TASK"
-          | "OTHER",
-        description: data.title + (data.notes ? ` - ${data.notes}` : ""),
-        leadId: data.leadId,
-        userId: data.userId || "admin",
-      };
-      return await activityService.create(activityData);
-    },
+    mutationFn: activityService.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
-      setShowAddActivity(false);
-      setNewActivity({
-        type: "",
-        title: "",
-        notes: "",
-        date: new Date().toISOString().split("T")[0],
-      });
+      console.log("Activity added successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to add activity:", error);
     },
   });
 
-  // Handlers
+  // Drag & Drop Handler
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || !active) return;
 
     const leadId = active.id as string;
-    const newStatus = over.id as string;
     const lead = leads.find((l) => l.id === leadId);
 
-    if (lead && lead.status !== newStatus) {
-      updateLeadMutation.mutate({ id: leadId, status: newStatus });
+    if (!lead) return;
+
+    // Tentukan status tujuan
+    let newStatus: string;
+    const statusValues = STATUSES as readonly string[];
+    if (statusValues.includes(over.id as string)) {
+      newStatus = over.id as string;
+    } else {
+      const overLead = leads.find((l) => l.id === over.id);
+      if (!overLead) return;
+      newStatus = overLead.status;
     }
+
+    // Jika status sama, tidak perlu update apa-apa
+    if (lead.status === newStatus) {
+      console.log("Same status, no update needed");
+      return;
+    }
+
+    // Update di cache dan backend
+    queryClient.setQueryData<ClientLead[]>(["leads"], (oldData) => {
+      if (!oldData) return oldData;
+      return oldData.map((l) =>
+        l.id === leadId
+          ? {
+              ...l,
+              status: newStatus as "OPEN" | "CONTACTED" | "PROPOSAL" | "CLOSED",
+            }
+          : l
+      );
+    });
+
+    updateLeadMutation.mutate(
+      { id: leadId, status: newStatus },
+      {
+        onError: () => {
+          queryClient.invalidateQueries({ queryKey: ["leads"] });
+        },
+      }
+    );
   };
 
+  // Handlers
   const handleAddLead = (status: string) => {
     setAddStatus(status);
   };
@@ -222,18 +346,33 @@ export function usePipelinePage() {
   };
 
   const handleSubmitNewLead = () => {
-    addLeadMutation.mutate({ ...newLead, status: addStatus });
+    if (addStatus && newLead.name && newLead.company && newLead.email) {
+      addLeadMutation.mutate({
+        name: newLead.name,
+        company: newLead.company,
+        email: newLead.email,
+        phone: "",
+        status: addStatus as "OPEN" | "CONTACTED" | "PROPOSAL" | "CLOSED",
+        source: "MANUAL",
+        value: 0,
+        notes: "",
+        assignedTo: "admin",
+      });
+      handleCloseAddDialog();
+    }
   };
 
   const handleCloseLeadDetail = () => {
     setActiveLead(null);
   };
 
-  const handleEditLead = () => {
-    if (activeLead) {
-      setEditLead(activeLead);
-      setActiveLead(null); // Close detail modal to show edit modal
-    }
+  const handleEditLead = (lead: ClientLead) => {
+    setEditLead(lead);
+    setNewLead({
+      name: lead.name,
+      company: lead.company,
+      email: lead.email,
+    });
   };
 
   const handleAddActivity = () => {
@@ -272,18 +411,22 @@ export function usePipelinePage() {
     if (
       activeLead &&
       newActivity.type &&
-      newActivity.title &&
-      newActivity.notes
+      (newActivity.title || newActivity.notes)
     ) {
       addActivityMutation.mutate({
-        type: newActivity.type,
-        title: newActivity.title,
-        notes: newActivity.notes,
-        date: newActivity.date,
+        type: newActivity.type as
+          | "EMAIL"
+          | "OTHER"
+          | "CALL"
+          | "MEETING"
+          | "NOTE"
+          | "TASK",
+        description:
+          newActivity.title || newActivity.notes || "Activity created",
         leadId: activeLead.id,
-        // TODO: Get actual user ID from session
-        userId: "user-id-placeholder",
+        userId: "current-user", // TODO: Replace with actual user ID
       });
+      handleCloseAddActivity();
     }
   };
 
@@ -311,6 +454,7 @@ export function usePipelinePage() {
     leads,
     isLoading,
     groupedColumns,
+    refreshFirebaseData,
 
     // Mutations
     addLeadMutation,

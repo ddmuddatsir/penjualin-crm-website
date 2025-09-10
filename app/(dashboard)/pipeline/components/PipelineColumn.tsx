@@ -16,13 +16,26 @@ export default function PipelineColumn({
   });
 
   // Default colors jika statusColor undefined
+  // Gunakan warna default yang konsisten dengan LEAD_STATUS_BG_BORDER jika tidak ada statusColor
   const defaultStatusColor = {
     bg: "bg-gray-50 dark:bg-gray-950",
     border: "border-gray-200 dark:border-gray-800",
     text: "text-gray-700 dark:text-gray-300",
   };
 
-  const safeStatusColor = statusColor || defaultStatusColor;
+  // Jika status OPEN dan tidak ada statusColor, gunakan bg-blue-50 dark:bg-blue-950
+  let safeStatusColor = statusColor;
+  if (!safeStatusColor) {
+    if (status === "OPEN") {
+      safeStatusColor = {
+        bg: "bg-blue-50 dark:bg-blue-950",
+        border: "border-blue-200 dark:border-blue-800",
+        text: "text-blue-700 dark:text-blue-300",
+      };
+    } else {
+      safeStatusColor = defaultStatusColor;
+    }
+  }
 
   return (
     <div className="flex-1 min-w-[260px]">
@@ -35,7 +48,7 @@ export default function PipelineColumn({
           <CardTitle className="flex items-center gap-2">
             {statusLabel}
             <span
-              className={`text-xs px-2 py-1 rounded-full bg-white ${safeStatusColor.border} ${safeStatusColor.text}`}
+              className={`text-xs px-2 py-1 rounded-full border ${safeStatusColor.border} ${safeStatusColor.text} bg-white dark:bg-zinc-900`}
             >
               {leads.length} leads
             </span>

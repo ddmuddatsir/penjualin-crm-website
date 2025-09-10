@@ -64,7 +64,7 @@ class ReportsService {
       },
       isPublic: data.isPublic,
       createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate(),
+      updatedAt: data.updatedAt?.toDate() || data.createdAt.toDate(),
     };
   }
 
@@ -530,7 +530,7 @@ class ReportsService {
           tags: data.tags,
           notes: data.notes,
           createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt.toDate(),
+          updatedAt: data.updatedAt?.toDate() || data.createdAt.toDate(),
         };
       });
 
@@ -548,20 +548,59 @@ class ReportsService {
       const q = query(activitiesRef, orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
 
-      const activities = snapshot.docs.slice(0, limit).map((doc) => {
-        const data = doc.data() as FirestoreActivity;
-        return {
-          id: doc.id,
-          type: data.type,
-          description: data.description,
-          leadId: data.leadId,
-          dealId: data.dealId,
-          userId: data.userId,
-          metadata: data.metadata,
-          createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt.toDate(),
-        };
-      });
+      const activities = await Promise.all(
+        snapshot.docs.slice(0, limit).map(async (docSnapshot) => {
+          const data = docSnapshot.data() as FirestoreActivity;
+
+          // Get related lead or deal information
+          let relatedInfo = null;
+          if (data.leadId) {
+            try {
+              const leadDoc = await getDoc(doc(db, "leads", data.leadId));
+              if (leadDoc.exists()) {
+                const leadData = leadDoc.data() as FirestoreLead;
+                relatedInfo = {
+                  type: "Lead",
+                  name: leadData.name,
+                  company: leadData.company,
+                  status: leadData.status,
+                  email: leadData.email,
+                };
+              }
+            } catch (error) {
+              console.log("Could not fetch lead data:", error);
+            }
+          } else if (data.dealId) {
+            try {
+              const dealDoc = await getDoc(doc(db, "deals", data.dealId));
+              if (dealDoc.exists()) {
+                const dealData = dealDoc.data() as FirestoreDeal;
+                relatedInfo = {
+                  type: "Deal",
+                  name: dealData.title,
+                  value: dealData.value,
+                  stage: dealData.stage,
+                };
+              }
+            } catch (error) {
+              console.log("Could not fetch deal data:", error);
+            }
+          }
+
+          return {
+            id: docSnapshot.id,
+            type: data.type,
+            description: data.description,
+            leadId: data.leadId,
+            dealId: data.dealId,
+            userId: data.userId,
+            metadata: data.metadata,
+            relatedInfo,
+            createdAt: data.createdAt.toDate(),
+            updatedAt: data.updatedAt?.toDate() || data.createdAt.toDate(),
+          };
+        })
+      );
 
       return activities;
     } catch (error) {

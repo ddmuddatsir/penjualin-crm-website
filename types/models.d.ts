@@ -63,6 +63,15 @@ export interface DashboardActivityType {
   dealId?: string;
   userId: string;
   metadata?: Record<string, unknown>;
+  relatedInfo?: {
+    type: "Lead" | "Deal";
+    name: string;
+    company?: string;
+    email?: string;
+    status?: string;
+    value?: number;
+    stage?: string;
+  } | null;
   createdAt: Date;
   updatedAt: Date;
 }

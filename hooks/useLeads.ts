@@ -38,10 +38,16 @@ export function useLeads(options: UseLeadsOptions = {}): UseLeadsReturn {
     refetch,
   } = useQuery({
     queryKey: ["leads"],
-    queryFn: () => leadService.getAll(),
+    queryFn: async () => {
+      console.log("useLeads - Starting to fetch leads...");
+      const result = await leadService.getAll();
+      console.log("useLeads - Fetched leads:", result.length, result);
+      return result;
+    },
     enabled,
     staleTime: 5 * 60 * 1000,
     retry: (failureCount) => {
+      console.log("useLeads - Retry attempt:", failureCount);
       return failureCount < 3;
     },
   });
@@ -75,14 +81,15 @@ export function useLeads(options: UseLeadsOptions = {}): UseLeadsReturn {
       data: Partial<Omit<ClientLead, "id" | "createdAt">>;
     }) => leadService.update(id, data),
     onSuccess: () => {
+      // Refetch data after successful update
       queryClient.invalidateQueries({ queryKey: ["leads"] });
       toast({
         title: "Success",
         description: "Lead updated successfully",
       });
     },
-    onError: (error) => {
-      console.error("Error updating lead:", error);
+    onError: (err) => {
+      console.error("Error updating lead:", err);
       toast({
         title: "Error",
         description: "Failed to update lead",

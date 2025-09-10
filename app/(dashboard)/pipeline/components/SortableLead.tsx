@@ -21,23 +21,32 @@ export default function SortableLead({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: lead.id });
+  } = useSortable({
+    id: lead.id,
+    data: {
+      type: "lead",
+      lead,
+    },
+  });
+
   return (
     <motion.div
       ref={setNodeRef}
       layout
+      key={lead.id} // Ensure stable key
       initial={{ scale: 1 }}
       animate={{
         scale: isDragging ? 1.05 : 1,
         boxShadow: isDragging ? "0 4px 16px rgba(0,0,0,0.15)" : "none",
+        opacity: isDragging ? 0.8 : 1, // Add opacity change for feedback
       }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       style={{
         transform: CSS.Transform.toString(transform),
-        transition,
+        transition: isDragging ? undefined : transition, // Disable transition during drag
         background: isDragging ? "rgb(243 244 246)" : undefined, // gray-100
         borderLeft: `4px solid ${statusColor(status)}`,
-        cursor: "grab",
+        cursor: isDragging ? "grabbing" : "grab",
       }}
       {...attributes}
       {...listeners}

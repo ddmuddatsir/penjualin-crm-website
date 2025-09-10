@@ -34,7 +34,9 @@ class UsersService {
       isActive: data.isActive,
       lastLoginAt: data.lastLoginAt?.toDate() as ClientUser["lastLoginAt"],
       createdAt: data.createdAt.toDate() as ClientUser["createdAt"],
-      updatedAt: data.updatedAt.toDate() as ClientUser["updatedAt"],
+      updatedAt:
+        data.updatedAt?.toDate() ||
+        (data.createdAt.toDate() as ClientUser["updatedAt"]),
       settings: data.settings,
     };
   }
