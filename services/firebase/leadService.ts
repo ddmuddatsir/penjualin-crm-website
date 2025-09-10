@@ -1,5 +1,5 @@
 // services/firebase/leadService.ts
-import { query, where, orderBy, QueryConstraint } from "firebase/firestore";
+import { where, orderBy, QueryConstraint } from "firebase/firestore";
 import { FirebaseBaseService } from "./base";
 import { FirestoreLead, ClientLead, COLLECTIONS } from "@/types/firebase";
 
