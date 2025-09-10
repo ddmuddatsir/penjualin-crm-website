@@ -10,6 +10,9 @@ import {
   UserCredential,
   updateProfile,
   sendPasswordResetEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -214,8 +217,43 @@ export class FirebaseAuthService {
         ...data,
         updatedAt: Timestamp.now(),
       });
+
+      // Also update Firebase Auth profile if name is updated
+      if (data.name && auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: data.name,
+        });
+      }
     } catch (error) {
       console.error("Error updating user profile:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update user password
+   */
+  async updateUserPassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        throw new Error("No authenticated user found");
+      }
+
+      // Re-authenticate user with current password
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        currentPassword
+      );
+      await reauthenticateWithCredential(user, credential);
+
+      // Update password
+      await updatePassword(user, newPassword);
+    } catch (error) {
+      console.error("Error updating password:", error);
       throw error;
     }
   }

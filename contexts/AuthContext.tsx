@@ -19,6 +19,11 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
+  updateProfile: (data: { name: string; email: string }) => Promise<void>;
+  updatePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -117,6 +122,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data: { name: string; email: string }) => {
+    try {
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+
+      await authService.updateUserProfile(user.uid, {
+        name: data.name,
+        email: data.email,
+      });
+
+      // Refresh user data
+      const updatedUserData = await authService.getUserData(user.uid);
+      setUserData(updatedUserData);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const updatePassword = async (
+    currentPassword: string,
+    newPassword: string
+  ) => {
+    try {
+      await authService.updateUserPassword(currentPassword, newPassword);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value = {
     user,
     userData,
@@ -126,6 +161,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithGoogle,
     signOut,
     sendPasswordReset,
+    updateProfile,
+    updatePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

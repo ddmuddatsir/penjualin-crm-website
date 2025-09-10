@@ -1,19 +1,52 @@
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { RoleManagementTableProps } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import { USER_ROLE } from "@/constants/user";
+
+// Helper function to format role display
+const formatRoleDisplay = (role: string): string => {
+  switch (role?.toUpperCase()) {
+    case USER_ROLE.ADMIN:
+      return "ADMIN";
+    case USER_ROLE.MANAGER:
+      return "MANAGER";
+    case USER_ROLE.SALES_REP:
+      return "SALES";
+    case USER_ROLE.SUPPORT:
+      return "SUPPORT";
+    case USER_ROLE.VIEWER:
+      return "VIEWER";
+    default:
+      return role?.toUpperCase() || "SALES";
+  }
+};
+
+// Helper function to get role badge variant
+const getRoleBadgeVariant = (
+  role: string
+): "default" | "secondary" | "destructive" | "outline" => {
+  switch (role?.toUpperCase()) {
+    case USER_ROLE.ADMIN:
+      return "destructive";
+    case USER_ROLE.MANAGER:
+      return "default";
+    case USER_ROLE.SALES_REP:
+      return "secondary";
+    default:
+      return "outline";
+  }
+};
+
+interface SimplifiedRoleManagementTableProps {
+  users: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  }>;
+}
 
 export default function RoleManagementTable({
   users,
-  editRole,
-  setEditRole,
-  roleMutation,
-}: RoleManagementTableProps) {
+}: SimplifiedRoleManagementTableProps) {
   return (
     <table className="w-full text-sm mb-3">
       <thead>
@@ -21,7 +54,6 @@ export default function RoleManagementTable({
           <th className="text-left py-2">Nama</th>
           <th className="text-left py-2">Email</th>
           <th className="text-left py-2">Role</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -30,46 +62,12 @@ export default function RoleManagementTable({
             <td className="py-2">{u.name}</td>
             <td className="py-2">{u.email}</td>
             <td className="py-2">
-              {editRole && editRole.id === u.id ? (
-                <Select
-                  value={editRole.role}
-                  onValueChange={(val) => setEditRole({ id: u.id, role: val })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="MANAGER">Manager</SelectItem>
-                    <SelectItem value="SALES">Sales</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                u.role
-              )}
-            </td>
-            <td className="py-2">
-              {editRole && editRole.id === u.id ? (
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    if (editRole) {
-                      roleMutation.mutate(editRole);
-                    }
-                    setEditRole(null);
-                  }}
-                >
-                  Simpan
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setEditRole({ id: u.id, role: u.role })}
-                >
-                  Edit
-                </Button>
-              )}
+              <Badge
+                variant={getRoleBadgeVariant(u.role)}
+                className="font-medium"
+              >
+                {formatRoleDisplay(u.role)}
+              </Badge>
             </td>
           </tr>
         ))}
