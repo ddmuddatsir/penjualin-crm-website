@@ -1,7 +1,8 @@
 "use client";
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "./ui/sheet";
+import { DialogVisuallyHidden } from "./ui/dialog";
 import { SidebarBrand } from "./Sidebar/SidebarBrand";
 import { SidebarContent } from "./Sidebar/SidebarContent";
 
@@ -28,6 +29,9 @@ export function Sidebar() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-4 w-56">
+            <DialogVisuallyHidden>
+              <SheetTitle>Navigation Menu</SheetTitle>
+            </DialogVisuallyHidden>
             <SidebarBrand />
             <SidebarContent
               menuItems={menuItems}

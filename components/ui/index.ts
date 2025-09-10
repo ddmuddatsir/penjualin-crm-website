@@ -32,6 +32,7 @@ export {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogVisuallyHidden,
 } from "./dialog";
 export {
   DropdownMenu,
